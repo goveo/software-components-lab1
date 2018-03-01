@@ -6,14 +6,16 @@ from collections import deque
 import re
 import xmlparser
 
-depth = 3
+# depth = 3
 
 with open('urls.xml') as xml:
     read_data = xml.read()
 # print("read_data : ", read_data)
 
 
-links = xmlparser.parse('urls.xml')
+links = xmlparser.get_links('urls.xml')
+depth = xmlparser.get_depth('urls.xml')
+
 # a queue of urls to be processed
 new_urls = deque(links)
 

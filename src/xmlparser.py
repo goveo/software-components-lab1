@@ -1,7 +1,7 @@
 from lxml import etree
 from bs4 import BeautifulSoup
 
-def parse(xml_filename):
+def get_links(xml_filename):
     links = []
     with open(xml_filename) as file:
         xml = file.read()
@@ -12,4 +12,15 @@ def parse(xml_filename):
             links.append(link.attrs["value"])
 
     return links
+
+def get_depth(xml_filename):
+    with open(xml_filename) as file:
+        xml = file.read()
+        soup = BeautifulSoup(xml, "html.parser")
+
+    depthEl = soup.find("depth")
+    if "value" in depthEl.attrs:
+        return int(depthEl.attrs["value"])
+
+    return 0
         
