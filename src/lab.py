@@ -4,11 +4,18 @@ import requests.exceptions
 from urllib.parse import urlsplit
 from collections import deque
 import re
+import xmlparser
 
 depth = 3
 
+with open('urls.xml') as xml:
+    read_data = xml.read()
+# print("read_data : ", read_data)
+
+
+links = xmlparser.parse('urls.xml')
 # a queue of urls to be processed
-new_urls = deque(['http://jumpingheads.herokuapp.com/'])
+new_urls = deque(links)
 
 # a set of urls that we have already processed
 processed_urls = set()
@@ -17,11 +24,12 @@ emails = set()
 visited = 0
 current_depth = 0
 
+
 def getLinksInSoup(soup):
     links = []
 
     for anchor in soup.find_all("a"):
-	
+
         if "href" in anchor.attrs:
             link = anchor.attrs["href"]
         else:
@@ -39,18 +47,22 @@ def getLinksInSoup(soup):
             links.append(link)
 
     return links
+
+
 def printUrls():
     for i in new_urls:
-        print (" url : %s " % i)
+        print(" url : %s " % i)
+
 
 for current_depth in range(depth + 1):
     # process all urls in this depth
     urls_of_this_depth = []
 
     while len(new_urls):
-        print('{0} links on depth #{1} left'.format(len(new_urls), current_depth))
+        print('{0} links on depth #{1} left'.format(
+            len(new_urls), current_depth))
         visited = visited + 1
-        
+
         # move next url from the queue to the set of processed urls
         url = new_urls.popleft()
         processed_urls.add(url)
@@ -68,7 +80,7 @@ for current_depth in range(depth + 1):
 
         # find emails
         new_emails = set(re.findall(
-            r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+_]+\.[a-z]+", response.text, re.I))      
+            r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+_]+\.[a-z]+", response.text, re.I))
         emails.update(new_emails)
 
         soup = BeautifulSoup(response.text, "html.parser")
@@ -76,7 +88,7 @@ for current_depth in range(depth + 1):
 
         for link in new_urls_from_current_page:
             urls_of_this_depth.append(link)
-    
+
     for newlink in urls_of_this_depth:
         new_urls.append(newlink)
     current_depth = current_depth + 1
@@ -85,5 +97,5 @@ if (len(emails) == 0):
     print("Pages don't have emails")
 else:
     print("emails on pages : ")
-    for email in emails: 
+    for email in emails:
         print(email)
