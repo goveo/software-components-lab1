@@ -9,8 +9,8 @@ import xmlparser
 
 parser = xmlparser.Parser("urls.xml")
 
-links = parser.getArrayAttributes('link', 'value')
-depth = int(parser.getOneAttribute('depth', 'value'))
+links = parser.getArrayAttributes('link')
+depth = int(parser.getOneAttribute('depth'))
 
 new_urls = deque(links)
 processed_urls = set()
@@ -97,5 +97,4 @@ for current_depth in range(depth + 1):
 
     current_depth = current_depth + 1
 
-# printEmails()
 parser.writeArrayToFile('emails.xml', 'emails', 'email', emails)

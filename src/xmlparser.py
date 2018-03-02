@@ -22,20 +22,32 @@ class Parser:
 
         self.filename = filename
 
-    def getArrayAttributes(self, attrName, value):
+    # def getArrayAttributes(self, elementName):
+    #     array = []
+    #     elements = self.soup.find_all(elementName)
+    #     for element in elements:
+    #         print('element.text : ', element.text)
+    #         if element.text:
+    #             array.append(element.text)
+
+    #     return array
+
+    def getArrayAttributes(self, elementName):
         array = []
-
-        for element in self.soup.find_all(attrName):
-            if value in element.attrs:
-                array.append(element.attrs[value])
-
+        xml = self.xml
+        print('self.xml : ', self.xml)
+        root = etree.fromstring(xml)
+        for region in root.getchildren():
+            for field in region.getchildren():
+                if field.tag == elementName:
+                    array.append(field.text)
         return array
 
-    def getOneAttribute(self, attrName, value):
 
-        element = self.soup.find(attrName)
-        if value in element.attrs:
-            return element.attrs[value]
+    def getOneAttribute(self, elementName):        
+        element = self.soup.find(elementName)
+        if element.text:
+            return element.text
         return None
 
     def writeArrayToFile(self, filename, arrayName, childName, array):
