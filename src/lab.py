@@ -6,20 +6,13 @@ from collections import deque
 import re
 import xmlparser
 
-# depth = 3
 
-with open('urls.xml') as xml:
-    read_data = xml.read()
-# print("read_data : ", read_data)
+parser = xmlparser.Parser("urls.xml")
 
+links = parser.getArrayAttributes('link', 'value')
+depth = int(parser.getOneAttribute('depth', 'value'))
 
-links = xmlparser.get_links('urls.xml')
-depth = xmlparser.get_depth('urls.xml')
-
-# a queue of urls to be processed
 new_urls = deque(links)
-
-# a set of urls that we have already processed
 processed_urls = set()
 emails = set()
 
@@ -27,7 +20,22 @@ visited = 0
 current_depth = 0
 
 
-def getLinksInSoup(soup):
+def getEmailsFromHtml(html):
+    return set(re.findall(
+        r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+_]+\.[a-z]+", html, re.I))
+
+def printEmails():
+    if (len(emails) == 0):
+	    print("Pages don't have emails")
+    else:
+        print("Emails on pages : ")
+        for email in emails:
+            print(email)
+
+
+
+def getLinksInHtml(html):
+    soup = BeautifulSoup(html, "html.parser")
     links = []
 
     for anchor in soup.find_all("a"):
@@ -51,13 +59,7 @@ def getLinksInSoup(soup):
     return links
 
 
-def printUrls():
-    for i in new_urls:
-        print(" url : %s " % i)
-
-
 for current_depth in range(depth + 1):
-    # process all urls in this depth
     urls_of_this_depth = []
 
     while len(new_urls):
@@ -74,30 +76,26 @@ for current_depth in range(depth + 1):
         base_url = "{0.scheme}://{0.netloc}".format(parts)
         path = url[:url.rfind('/')+1] if '/' in parts.path else url
 
-        print("Visited %s" % url)
+        print("Visited %s" % (url))
         try:
             response = requests.get(url)
         except (requests.exceptions.MissingSchema, requests.exceptions.ConnectionError):
             continue
 
         # find emails
-        new_emails = set(re.findall(
-            r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+_]+\.[a-z]+", response.text, re.I))
+        page_html = response.text
+        new_emails = getEmailsFromHtml(page_html)
         emails.update(new_emails)
 
-        soup = BeautifulSoup(response.text, "html.parser")
-        new_urls_from_current_page = getLinksInSoup(soup)
+        new_urls_from_current_page = getLinksInHtml(page_html)
 
         for link in new_urls_from_current_page:
             urls_of_this_depth.append(link)
 
     for newlink in urls_of_this_depth:
         new_urls.append(newlink)
+
     current_depth = current_depth + 1
 
-if (len(emails) == 0):
-    print("Pages don't have emails")
-else:
-    print("emails on pages : ")
-    for email in emails:
-        print(email)
+# printEmails()
+parser.writeArrayToFile('emails.xml', 'emails', 'email', emails)
