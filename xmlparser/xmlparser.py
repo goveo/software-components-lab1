@@ -47,4 +47,4 @@ class Parser:
 
         file = open(filename, 'w')
         file.write(prettify(xmlArray))
-        file.close
+        file.close()

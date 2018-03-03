@@ -5,7 +5,7 @@ import requests.exceptions
 from urllib.parse import urlsplit
 from collections import deque
 import re
-from XmlParser import xmlparser
+from xmlparser import xmlparser
 
 
 parser = xmlparser.Parser("urls.xml")
