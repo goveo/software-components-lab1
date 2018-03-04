@@ -20,31 +20,31 @@ class Parser:
 
         self.filename = filename
 
-    def getArrayAttributes(self, elementName):
+    def get_array_attributes(self, elementname):
         array = []
         xml = self.xml
         root = etree.fromstring(xml)
         for region in root.getchildren():
             for field in region.getchildren():
-                if field.tag == elementName:
+                if field.tag == elementname:
                     array.append(field.text)
         return array
 
-    def getOneAttribute(self, elementName):
-        element = self.soup.find(elementName)
+    def get_one_attribute(self, elementname):
+        element = self.soup.find(elementname)
         if element.text:
             return element.text
         return None
 
-    def writeArrayToFile(self, filename, arrayName, childName, array):
+    def write_array_to_file(self, filename, arrayname, childname, array):
 
-        xmlArray = Element(arrayName)
+        xml_array = Element(arrayname)
 
         for child in array:
             text = child
-            child = SubElement(xmlArray, childName)
+            child = SubElement(xml_array, childname)
             child.text = text
 
         file = open(filename, 'w')
-        file.write(prettify(xmlArray))
+        file.write(prettify(xml_array))
         file.close()

@@ -1,17 +1,15 @@
 
 from bs4 import BeautifulSoup
-import requests
 import requests.exceptions
 from urllib.parse import urlsplit
 from collections import deque
 import re
 from xmlparser import xmlparser
 
-
 parser = xmlparser.Parser("urls.xml")
 
-links = parser.getArrayAttributes('link')
-depth = int(parser.getOneAttribute('depth'))
+links = parser.get_array_attributes('link')
+depth = int(parser.get_one_attribute('depth'))
 
 new_urls = deque(links)
 processed_urls = set()
@@ -21,13 +19,13 @@ visited = 0
 current_depth = 0
 
 
-def getEmailsFromHtml(html):
+def get_emails_from_html(html):
     return set(re.findall(
-        r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+_]+\.[a-z]+", html, re.I))
+        r"[a-z0-9.\-+_]+@[a-z0-9.\-+_]+\.[a-z]+", html, re.I))
 
 
-def printEmails():
-    if (len(emails) == 0):
+def print_emails():
+    if len(emails) == 0:
         print("Pages don't have emails")
     else:
         print("Emails on pages : ")
@@ -35,7 +33,7 @@ def printEmails():
             print(email)
 
 
-def getLinksInHtml(html):
+def get_links_from_html(html):
     soup = BeautifulSoup(html, "html.parser")
     links = []
 
@@ -78,7 +76,7 @@ if __name__ == "__main__":
             base_url = "{0.scheme}://{0.netloc}".format(parts)
             path = url[:url.rfind('/')+1] if '/' in parts.path else url
 
-            print("Visited %s" % (url))
+            print("Visited %s" % url)
             try:
                 response = requests.get(url)
             except (requests.exceptions.MissingSchema,
@@ -87,10 +85,10 @@ if __name__ == "__main__":
 
             # find emails
             page_html = response.text
-            new_emails = getEmailsFromHtml(page_html)
+            new_emails = get_emails_from_html(page_html)
             emails.update(new_emails)
 
-            new_urls_from_current_page = getLinksInHtml(page_html)
+            new_urls_from_current_page = get_links_from_html(page_html)
 
             for link in new_urls_from_current_page:
                 urls_of_this_depth.append(link)
@@ -100,4 +98,4 @@ if __name__ == "__main__":
 
         current_depth = current_depth + 1
 
-    parser.writeArrayToFile('emails.xml', 'emails', 'email', emails)
+    parser.write_array_to_file('emails.xml', 'emails', 'email', emails)
