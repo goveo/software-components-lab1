@@ -1,4 +1,3 @@
-
 from bs4 import BeautifulSoup
 import requests.exceptions
 from urllib.parse import urlsplit
@@ -6,7 +5,7 @@ from collections import deque
 import re
 from xmlparser import xmlparser
 
-parser = xmlparser.Parser("urls.xml")
+parser = xmlparser.Parser("input.xml")
 
 links = parser.get_array_attributes('link')
 depth = int(parser.get_one_attribute('depth'))
@@ -98,4 +97,4 @@ if __name__ == "__main__":
 
         current_depth = current_depth + 1
 
-    parser.write_array_to_file('emails.xml', 'emails', 'email', emails)
+    xmlparser.write_array_to_file('output.xml', 'emails', 'email', emails)

@@ -5,6 +5,7 @@ from xml.etree.ElementTree import Element, SubElement, Comment
 from xml.etree import ElementTree
 from xml.dom import minidom
 
+import os 
 
 def prettify(elem):
     rough_string = ElementTree.tostring(elem, 'utf-8')
@@ -12,9 +13,31 @@ def prettify(elem):
     return reparsed.toprettyxml(indent="  ")
 
 
+def write_array_to_file(filename, arrayname, childname, array):
+
+    xml_element = Element("data")
+    data_array = SubElement(xml_element, arrayname)
+
+    for child in array:
+        text = child
+        child = SubElement(data_array, childname)
+        child.text = text
+
+    string_xml = prettify(xml_element)
+    file = open(filename, 'w')
+    file.write(string_xml)
+    file.close()
+
+    return string_xml
+
+
 class Parser:
     def __init__(self, filename):
-        with open(filename) as file:
+        print('filename:' + filename)
+        path = os.path.dirname(os.path.realpath(__file__))
+        path = path + "/../" + filename
+        print('path :' + path)
+        with open(path) as file:
             self.xml = file.read()
             self.soup = BeautifulSoup(self.xml, "html.parser")
 
@@ -35,16 +58,3 @@ class Parser:
         if element.text:
             return element.text
         return None
-
-    def write_array_to_file(self, filename, arrayname, childname, array):
-
-        xml_array = Element(arrayname)
-
-        for child in array:
-            text = child
-            child = SubElement(xml_array, childname)
-            child.text = text
-
-        file = open(filename, 'w')
-        file.write(prettify(xml_array))
-        file.close()
