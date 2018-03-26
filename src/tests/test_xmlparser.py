@@ -9,6 +9,9 @@ write_parser = xmlparser.Parser("./tests/write_test.xml")
 
 class TestXmlParser(unittest.TestCase):
 
+	def test_wrong_filename(self):
+		self.assertRaises(Exception, xmlparser.Parser, "xml")
+		
 	def test_get_one_attribute(self):
 		result = parser.get_one_attribute('solo')
 		self.assertEqual('solo_test', result)

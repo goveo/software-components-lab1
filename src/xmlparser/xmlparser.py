@@ -32,13 +32,15 @@ def write_array_to_file(filename, arrayname, childname, array):
 
 class Parser:
     def __init__(self, filename):
-        print('filename:' + filename)
         path = os.path.dirname(os.path.realpath(__file__))
         path = path + "/../" + filename
-        print('path :' + path)
-        with open(path) as file:
-            self.xml = file.read()
-            self.soup = BeautifulSoup(self.xml, "html.parser")
+        try:
+            with open(path) as file:
+                self.xml = file.read()
+                self.soup = BeautifulSoup(self.xml, "html.parser")
+        except(TypeError):
+            raise Exception("Wrong filename")
+            
 
         self.filename = filename
 

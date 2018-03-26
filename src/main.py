@@ -19,8 +19,20 @@ current_depth = 0
 
 
 def get_emails_from_html(html):
-    return set(re.findall(
-        r"[a-z0-9.\-+_]+@[a-z0-9.\-+_]+\.[a-z]+", html, re.I))
+    # explicit = set(re.findall(
+    #     r"[a-z0-9.\-+_]+@[a-z0-9.\-+_]+\.[a-z]+", html, re.I));
+    # not_explicit = set(re.findall('([a-zA-Z0-9_.+-]+\s?(?:\(at\)|\[at\])\s?[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)', html, re.I))
+    # email_on_page = email_on_page.update(explicit)
+    # email_on_page = email_on_page.update(not_explicit)
+    # print("email_on_page : ", email_on_page)
+
+    email_on_page = set(re.findall(r"[a-z0-9.\-+_]+@[a-z0-9.\-+_]+\.[a-z]+", html, re.I));
+    email_on_page = email_on_page | (
+        set(re.findall('([a-zA-Z0-9_.+-]+\s?(?:\(at\)|\[at\])\s?[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)', html, re.I)))
+
+    print("email_on_page : ", email_on_page)     
+
+    return email_on_page
 
 
 def print_emails():
