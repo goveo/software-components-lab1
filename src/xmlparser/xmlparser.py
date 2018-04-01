@@ -38,9 +38,8 @@ class Parser:
             with open(path) as file:
                 self.xml = file.read()
                 self.soup = BeautifulSoup(self.xml, "html.parser")
-        except(TypeError):
+        except():
             raise Exception("Wrong filename")
-            
 
         self.filename = filename
 

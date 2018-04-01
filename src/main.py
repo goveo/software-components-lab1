@@ -17,22 +17,25 @@ emails = set()
 visited = 0
 current_depth = 0
 
+hidden_email_re = \
+    "([a-zA-Z0-9_.+-]+\s?(?:\(at\)|\[at\])\s?[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)"
+
 
 def get_emails_from_html(html):
-    # explicit = set(re.findall(
-    #     r"[a-z0-9.\-+_]+@[a-z0-9.\-+_]+\.[a-z]+", html, re.I));
-    # not_explicit = set(re.findall('([a-zA-Z0-9_.+-]+\s?(?:\(at\)|\[at\])\s?[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)', html, re.I))
-    # email_on_page = email_on_page.update(explicit)
-    # email_on_page = email_on_page.update(not_explicit)
-    # print("email_on_page : ", email_on_page)
+    hidden_emails = set()
+    emails_on_page = set(re.findall(
+        r"[a-z0-9.\-+_]+@[a-z0-9.\-+_]+\.[a-z]+", html, re.I))
+    hidden = set(re.findall(hidden_email_re, html, re.I))
+    for email in hidden:
+        if (email.replace("(at)", "@", 1) != email):
+            email = email.replace("(at)", "@", 1)
+        else:
+            email = email.replace("[at]", "@", 1)
+        hidden_emails.add(email)
+        
+    emails_on_page = emails_on_page | hidden_emails
 
-    email_on_page = set(re.findall(r"[a-z0-9.\-+_]+@[a-z0-9.\-+_]+\.[a-z]+", html, re.I));
-    email_on_page = email_on_page | (
-        set(re.findall('([a-zA-Z0-9_.+-]+\s?(?:\(at\)|\[at\])\s?[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)', html, re.I)))
-
-    print("email_on_page : ", email_on_page)     
-
-    return email_on_page
+    return emails_on_page
 
 
 def print_emails():
@@ -110,3 +113,4 @@ if __name__ == "__main__":
         current_depth = current_depth + 1
 
     xmlparser.write_array_to_file('output.xml', 'emails', 'email', emails)
+    print_emails()
